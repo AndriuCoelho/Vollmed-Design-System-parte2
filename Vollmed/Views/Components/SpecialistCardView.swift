@@ -101,3 +101,25 @@ struct SpecialistCardView_Previews: PreviewProvider {
         )
     }
 }
+
+struct PopOverController<Content: View>: UIViewControllerRepresentable {
+    
+    // MARK: - Attributes
+    
+    @Binding var isPresented: Bool
+    var content: Content
+    var arrowDirection: UIPopoverArrowDirection
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        let controller = UIViewController()
+        controller.view.backgroundColor = .clear
+        
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) { }
+    
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(parent: self)
+    }
+}
