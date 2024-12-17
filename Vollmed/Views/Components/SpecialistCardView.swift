@@ -134,4 +134,28 @@ struct PopOverController<Content: View>: UIViewControllerRepresentable {
     func makeCoordinator() -> Coordinator {
         return Coordinator(parent: self)
     }
+    
+    class Coordinator: NSObject, UIPopoverPresentationControllerDelegate {
+        
+        let parent: PopOverController
+        
+        init(parent: PopOverController) {
+            self.parent = parent
+        }
+        
+        func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+            return .none
+        }
+        
+        func presentationControllerWillDismiss(_ presentationController: UIPresentationController) {
+            parent.isPresented = false
+        }
+    }
+}
+
+class CustomHostingView<Content: View>: UIHostingController<Content> {
+    
+    override func viewDidLoad() {
+        preferredContentSize = view.intrinsicContentSize
+    }
 }
