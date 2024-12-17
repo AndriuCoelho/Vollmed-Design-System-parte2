@@ -15,7 +15,7 @@ struct SpecialistCardView: View {
     let service = WebService()
     
     @State private var specialistImage: UIImage?
-    @State private var showPopover = false
+    @State private var showTooltip: Bool = false
     
     func downloadImage() async {
         do {
@@ -38,9 +38,21 @@ struct SpecialistCardView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 8.0) {
-                    Text(specialist.name)
-                        .font(.title3)
-                        .bold()
+                    HStack {
+                        Text(specialist.name)
+                            .font(.title3)
+                            .bold()
+                        
+                        Button {
+                            showTooltip.toggle()
+                        } label: {
+                            Image(systemName: "info")
+                        }
+                        .iOSPopover(isPresented: $showTooltip,
+                                    arrowDirection: .up) {
+                            VollmedTooltipView(title: "Disponível", description: "Agende sua consulta")
+                        }
+                    }
                     Text(specialist.specialty)
                     if let appointment = appointment {
                         Text(appointment.date.convertDateStringToReadableDate())
@@ -102,6 +114,16 @@ struct SpecialistCardView_Previews: PreviewProvider {
     }
 }
 
+extension View {
+    func iOSPopover<Content: View>(isPresented: Binding<Bool>, arrowDirection: UIPopoverArrowDirection, content: @escaping() -> Content) -> some View {
+        self.background {
+            PopOverController(isPresented: isPresented,
+                              content: content(),
+                              arrowDirection: arrowDirection)
+        }
+    }
+}
+
 struct PopOverController<Content: View>: UIViewControllerRepresentable {
     
     // MARK: - Attributes
@@ -119,12 +141,14 @@ struct PopOverController<Content: View>: UIViewControllerRepresentable {
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
         if isPresented {
-            let controller = UIHostingController(rootView: content)
+            let controller = CustomHostingView(rootView: content)
             
             controller.view.backgroundColor = .clear
             controller.modalPresentationStyle = .popover
             controller.popoverPresentationController?.permittedArrowDirections = arrowDirection
-                        
+            
+            controller.presentationController?.delegate = context.coordinator
+            
             controller.popoverPresentationController?.sourceView = uiViewController.view
             
             uiViewController.present(controller, animated: true)
