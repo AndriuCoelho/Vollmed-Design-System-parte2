@@ -56,6 +56,12 @@ struct ScheduleAppointmentView: View {
             self.scheduleAppointmentSuccess = false
         }
         self.showAlert = true
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                self.showAlert = false
+            }
+        }
     }
     
     var body: some View {
