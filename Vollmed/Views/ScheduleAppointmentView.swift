@@ -56,12 +56,6 @@ struct ScheduleAppointmentView: View {
             self.scheduleAppointmentSuccess = false
         }
         self.showAlert = true
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                showAlert = false
-            }
-        }
     }
     
     var body: some View {
@@ -97,12 +91,16 @@ struct ScheduleAppointmentView: View {
             .onAppear {
                 UIDatePicker.appearance().minuteInterval = 15
             }
-            .alert(isPresented: $showAlert) {
-                if self.scheduleAppointmentSuccess {
-                    return Alert(title: Text("Sucesso!"), message: Text("A consulta foi \(isRescheduleView ? "remarcada" : "agendada") com sucesso."))
+            .overlay(
+                VStack {
+                    Spacer()
+                    if showAlert {
+                        VollmedSnackBar(title: "Sucesso",
+                                        description: "A consulta foi \(isRescheduleView ? "remarcado" : "agendada") com sucesso")
+                        .transition(.move(edge: .bottom))
+                    }
                 }
-                return Alert(title: Text("Ops, algo deu errado!"), message: Text("Houve um erro ao \(isRescheduleView ? "remarcar" : "agendar") sua consulta. Por favor tente novamente ou entre em contato via telefone."))
-            }
+            )
         }
     }
 }
