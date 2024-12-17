@@ -117,7 +117,19 @@ struct PopOverController<Content: View>: UIViewControllerRepresentable {
         return controller
     }
     
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) { }
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        if isPresented {
+            let controller = UIHostingController(rootView: content)
+            
+            controller.view.backgroundColor = .clear
+            controller.modalPresentationStyle = .popover
+            controller.popoverPresentationController?.permittedArrowDirections = arrowDirection
+                        
+            controller.popoverPresentationController?.sourceView = uiViewController.view
+            
+            uiViewController.present(controller, animated: true)
+        }
+    }
     
     func makeCoordinator() -> Coordinator {
         return Coordinator(parent: self)
